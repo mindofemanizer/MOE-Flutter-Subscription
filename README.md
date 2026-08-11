@@ -9,7 +9,7 @@ dependencies:
   moe_flutter_subscription:
     git:
       url: https://github.com/mindofemanizer/MOE-Flutter-Subscription.git
-      ref: master
+      ref: main
 ```
 
 ## Usage
