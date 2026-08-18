@@ -101,7 +101,7 @@ class SubscriptionRepository {
           'user_id': userId,
           'plan_id': planId,
           'payment_method': paymentMethod,
-          if (customerId != null) 'customer_id': customerId,
+          'customer_id': ?customerId,
         },
       );
       return Ok(
@@ -122,7 +122,7 @@ class SubscriptionRepository {
     try {
       await _dio.post(
         '/subscriptions/$id/cancel',
-        data: {if (reason != null) 'reason': reason},
+        data: {'reason': ?reason},
       );
       return const Ok(null);
     } on DioException catch (e) {

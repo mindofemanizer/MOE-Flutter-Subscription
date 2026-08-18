@@ -6,7 +6,7 @@ enum SubscriptionStatus {
   paused('paused', 'Dijeda'),
   cancelled('cancelled', 'Dibatalkan'),
   expired('expired', 'Kadaluarsa'),
-  past_due('past_due', 'Terlambat'),
+  pastDue('past_due', 'Terlambat'),
   revoked('revoked', 'Dicabut');
 
   const SubscriptionStatus(this.value, this.displayName);

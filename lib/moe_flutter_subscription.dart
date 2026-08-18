@@ -1,4 +1,5 @@
 /// Barrel file — public API for moe_flutter_subscription.
+library;
 export 'src/config/subscription_config.dart';
 export 'src/models/billing_cycle.dart';
 export 'src/models/subscription_status.dart';
