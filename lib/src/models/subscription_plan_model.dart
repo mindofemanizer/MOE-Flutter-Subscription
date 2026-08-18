@@ -1,3 +1,7 @@
+import 'package:equatable/equatable.dart';
+
+import 'package:moe_flutter_subscription/src/models/billing_cycle.dart';
+
 /// Subscription plan with features & pricing.
 class SubscriptionPlanModel extends Equatable {
   final String id;
@@ -30,7 +34,7 @@ class SubscriptionPlanModel extends Equatable {
     this.enableApiAccess = false,
     required this.createdAt,
     required this.updatedAt,
-  }) : assert price >= 0;
+  }) : assert(price >= 0);
 
   factory SubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
     return SubscriptionPlanModel(
@@ -72,11 +76,12 @@ class SubscriptionPlanModel extends Equatable {
 
   /// Monthly price equivalent for comparison.
   double get monthlyEquivalent {
-    return switch (billingCycle) {
-      BillingCycle daily => price * 30,
-      BillingCycle weekly => price * 4.33, // average weeks per month
-      BillingCycle monthly => price,
-      BillingCycle yearly => price / 12,
+    return switch (billingCycle.stringValue) {
+      'daily' => price * 30,
+      'weekly' => price * 4.33, // average weeks per month
+      'monthly' => price,
+      'yearly' => price / 12,
+      _ => price,
     };
   }
 

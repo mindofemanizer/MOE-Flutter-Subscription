@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moe_flutter_core/moe_flutter_core.dart';
-import 'package:moe_flutter_subscription/src/config/subscription_config.dart';
 import 'package:moe_flutter_subscription/src/models/subscription_plan_model.dart';
 import 'package:moe_flutter_subscription/src/models/subscription_model.dart';
 import 'package:moe_flutter_subscription/src/services/subscription_repository.dart';
@@ -11,9 +10,13 @@ sealed class PlansState {
   const PlansState();
 }
 
-final class PlansInitial extends PlansState {}
+final class PlansInitial extends PlansState {
+  const PlansInitial();
+}
 
-final class PlansLoading extends PlansState {}
+final class PlansLoading extends PlansState {
+  const PlansLoading();
+}
 
 final class PlansLoaded extends PlansState {
   final List<SubscriptionPlanModel> plans;
@@ -47,17 +50,19 @@ class PlansNotifier extends StateNotifier<PlansState> {
   /// Get cheapest plan by monthly equivalent.
   SubscriptionPlanModel? getCheapest() {
     if (state is! PlansLoaded) return null;
-    
+
     final plans = (state as PlansLoaded).plans;
     if (plans.isEmpty) return null;
-    
-    return plans.reduce((a, b) => a.monthlyEquivalent < b.monthlyEquivalent ? a : b);
+
+    return plans.reduce(
+      (a, b) => a.monthlyEquivalent < b.monthlyEquivalent ? a : b,
+    );
   }
 
   /// Find trial plan if available.
   SubscriptionPlanModel? getTrialPlan() {
     if (state is! PlansLoaded) return null;
-    
+
     final loaded = state as PlansLoaded;
     return loaded.plans.firstWhere(
       (p) => p.trialDays > 0,
@@ -71,9 +76,13 @@ sealed class SubscriptionsState {
   const SubscriptionsState();
 }
 
-final class SubscriptionsInitial extends SubscriptionsState {}
+final class SubscriptionsInitial extends SubscriptionsState {
+  const SubscriptionsInitial();
+}
 
-final class SubscriptionsLoading extends SubscriptionsState {}
+final class SubscriptionsLoading extends SubscriptionsState {
+  const SubscriptionsLoading();
+}
 
 final class SubscriptionsLoaded extends SubscriptionsState {
   final SubscriptionModel? activeSubscription;
@@ -97,15 +106,14 @@ class SubscriptionsNotifier extends StateNotifier<SubscriptionsState> {
 
     final result = await _repository.getCurrentSubscription(userId);
 
-    if (result is Ok && result.data != null) {
-      state = SubscriptionsLoaded(
-        activeSubscription: result.data,
-        history: [], // Will be loaded separately
-      );
-    } else if (result is Ok && result.data == null) {
-      state = SubscriptionsLoaded(activeSubscription: null, history: []);
-    } else {
-      state = SubscriptionsError(result.failure);
+    switch (result) {
+      case Ok(:final data):
+        state = SubscriptionsLoaded(
+          activeSubscription: data,
+          history: [], // Will be loaded separately
+        );
+      case Err(:final failure):
+        state = SubscriptionsError(failure);
     }
 
     return result;
@@ -114,11 +122,12 @@ class SubscriptionsNotifier extends StateNotifier<SubscriptionsState> {
   Future<AppResult<List<SubscriptionModel>>> getHistory(String userId) async {
     final result = await _repository.listSubscriptions(userId);
 
-    if (result is Ok && state is SubscriptionsLoaded) {
+    if (result case Ok(:final data)) {
+      if (state is! SubscriptionsLoaded) return result;
       final loaded = state as SubscriptionsLoaded;
       state = SubscriptionsLoaded(
         activeSubscription: loaded.activeSubscription,
-        history: result.data,
+        history: data,
       );
     }
 
@@ -138,11 +147,12 @@ class SubscriptionsNotifier extends StateNotifier<SubscriptionsState> {
       customerId: customerId,
     );
 
-    if (result is Ok && state is SubscriptionsLoaded) {
+    if (result case Ok(:final data)) {
+      if (state is! SubscriptionsLoaded) return result;
       final loaded = state as SubscriptionsLoaded;
       // Update active subscription
       state = SubscriptionsLoaded(
-        activeSubscription: result.data,
+        activeSubscription: data,
         history: [...loaded.history],
       );
     }
@@ -156,10 +166,10 @@ class SubscriptionsNotifier extends StateNotifier<SubscriptionsState> {
     if (result is Ok && state is SubscriptionsLoaded) {
       final loaded = state as SubscriptionsLoaded;
       // Remove from active if matched
-      final newActive = loaded.activeSubscription?.id == id 
-          ? null 
+      final newActive = loaded.activeSubscription?.id == id
+          ? null
           : loaded.activeSubscription;
-      
+
       state = SubscriptionsLoaded(
         activeSubscription: newActive,
         history: loaded.history,
@@ -170,15 +180,18 @@ class SubscriptionsNotifier extends StateNotifier<SubscriptionsState> {
 
 /// Provider for SubscriptionRepository.
 final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
-  throw UnimplementedError('MoeSubscription.setup() must be called before use.');
+  throw UnimplementedError(
+    'MoeSubscription.setup() must be called before use.',
+  );
 });
 
 /// Provider for PlansNotifier.
-final plansProvider = StateNotifierProviderFactory<PlansNotifier>(
+final plansProvider = StateNotifierProvider<PlansNotifier, PlansState>(
   (ref) => PlansNotifier(ref.watch(subscriptionRepositoryProvider)),
 );
 
 /// Provider for SubscriptionsNotifier.
-final subscriptionsProvider = StateNotifierProviderFactory<SubscriptionsNotifier>(
-  (ref) => SubscriptionsNotifier(ref.watch(subscriptionRepositoryProvider)),
-);
+final subscriptionsProvider =
+    StateNotifierProvider<SubscriptionsNotifier, SubscriptionsState>(
+      (ref) => SubscriptionsNotifier(ref.watch(subscriptionRepositoryProvider)),
+    );

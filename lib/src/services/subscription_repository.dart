@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moe_flutter_core/moe_flutter_core.dart';
 import 'package:moe_flutter_subscription/src/config/subscription_config.dart';
@@ -9,9 +8,8 @@ import 'package:moe_flutter_subscription/src/models/subscription_model.dart';
 /// Repository for subscription operations.
 class SubscriptionRepository {
   final Dio _dio;
-  final MoeSubscriptionConfig _config;
 
-  SubscriptionRepository(this._dio, this._config);
+  SubscriptionRepository(this._dio, MoeSubscriptionConfig _);
 
   // ── Plans ──────────────────────────────────────────────────
 
@@ -28,10 +26,7 @@ class SubscriptionRepository {
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
@@ -39,42 +34,44 @@ class SubscriptionRepository {
   Future<AppResult<SubscriptionPlanModel>> getPlan(String id) async {
     try {
       final response = await _dio.get('/plans/$id');
-      return Ok(SubscriptionPlanModel.fromJson(response.data as Map<String, dynamic>));
+      return Ok(
+        SubscriptionPlanModel.fromJson(response.data as Map<String, dynamic>),
+      );
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
   // ── Subscriptions ──────────────────────────────────────────
 
   /// Get user's current subscription.
-  Future<AppResult<SubscriptionModel?>> getCurrentSubscription(String userId) async {
+  Future<AppResult<SubscriptionModel?>> getCurrentSubscription(
+    String userId,
+  ) async {
     try {
       final response = await _dio.get('/subscriptions/user/$userId/active');
       if (response.statusCode == 204) {
         return const Ok(null); // No active subscription
       }
-      return Ok(SubscriptionModel.fromJson(response.data as Map<String, dynamic>));
+      return Ok(
+        SubscriptionModel.fromJson(response.data as Map<String, dynamic>),
+      );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         return const Ok(null);
       }
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
   /// List user's subscription history.
-  Future<AppResult<List<SubscriptionModel>>> listSubscriptions(String userId) async {
+  Future<AppResult<List<SubscriptionModel>>> listSubscriptions(
+    String userId,
+  ) async {
     try {
       final response = await _dio.get('/subscriptions/user/$userId');
       final data = response.data as List<dynamic>;
@@ -86,10 +83,7 @@ class SubscriptionRepository {
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
@@ -101,37 +95,40 @@ class SubscriptionRepository {
     String? customerId,
   }) async {
     try {
-      final response = await _dio.post('/subscriptions', data: {
-        'user_id': userId,
-        'plan_id': planId,
-        'payment_method': paymentMethod,
-        if (customerId != null) 'customer_id': customerId,
-      });
-      return Ok(SubscriptionModel.fromJson(response.data as Map<String, dynamic>));
+      final response = await _dio.post(
+        '/subscriptions',
+        data: {
+          'user_id': userId,
+          'plan_id': planId,
+          'payment_method': paymentMethod,
+          if (customerId != null) 'customer_id': customerId,
+        },
+      );
+      return Ok(
+        SubscriptionModel.fromJson(response.data as Map<String, dynamic>),
+      );
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
   /// Cancel subscription.
-  Future<AppResult<void>> cancelSubscription(String id, {String? reason}) async {
+  Future<AppResult<void>> cancelSubscription(
+    String id, {
+    String? reason,
+  }) async {
     try {
-      await _dio.post('/subscriptions/$id/cancel', data: {
-        if (reason != null) 'reason': reason,
-      });
+      await _dio.post(
+        '/subscriptions/$id/cancel',
+        data: {if (reason != null) 'reason': reason},
+      );
       return const Ok(null);
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
@@ -143,10 +140,7 @@ class SubscriptionRepository {
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 
@@ -157,18 +151,17 @@ class SubscriptionRepository {
     required String paymentMethod,
   }) async {
     try {
-      final response = await _dio.post('/subscriptions/$subscriptionId/upgrade', data: {
-        'new_plan_id': newPlanId,
-        'payment_method': paymentMethod,
-      });
-      return Ok(SubscriptionModel.fromJson(response.data as Map<String, dynamic>));
+      final response = await _dio.post(
+        '/subscriptions/$subscriptionId/upgrade',
+        data: {'new_plan_id': newPlanId, 'payment_method': paymentMethod},
+      );
+      return Ok(
+        SubscriptionModel.fromJson(response.data as Map<String, dynamic>),
+      );
     } on DioException catch (e) {
       return Err(mapDioErrorToFailure(e));
     } catch (e) {
-      return Err(AppFailure(
-        type: FailureType.unknown,
-        message: e.toString(),
-      ));
+      return Err(AppFailure(type: FailureType.unknown, message: e.toString()));
     }
   }
 }

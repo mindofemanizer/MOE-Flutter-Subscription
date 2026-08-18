@@ -36,7 +36,7 @@ void main() {
 
   group('SubscriptionPlanModel', () {
     test('monthlyEquivalent calculates correctly', () {
-      const yearlyPlan = SubscriptionPlanModel(
+      final yearlyPlan = SubscriptionPlanModel(
         id: 'plan-yearly',
         name: 'Yearly Plan',
         description: 'Annual subscription',
@@ -52,7 +52,7 @@ void main() {
     });
 
     test('hasFeature checks feature availability', () {
-      const plan = SubscriptionPlanModel(
+      final plan = SubscriptionPlanModel(
         id: 'plan-basic',
         name: 'Basic',
         description: 'Basic plan',
@@ -101,14 +101,14 @@ void main() {
 
   group('SubscriptionModel', () {
     test('isActive returns true when status is active', () {
-      const subscription = SubscriptionModel(
+      final subscription = SubscriptionModel(
         id: 'sub1',
         userId: 'user1',
         planId: 'plan-monthly',
         planName: 'Monthly',
         status: SubscriptionStatus.active,
         startedAt: DateTime.now(),
-        paymentMethod: PaymentMethod.onlineBankTransfer.code,
+        paymentMethod: 'bank_transfer',
         customerId: 'cust_123',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -127,7 +127,7 @@ void main() {
         status: SubscriptionStatus.trial,
         startedAt: DateTime.now().subtract(Duration(days: 5)),
         trialEndsAt: DateTime.now().add(Duration(days: 9)),
-        paymentMethod: PaymentMethod.onlineBankTransfer.code,
+        paymentMethod: 'bank_transfer',
         customerId: 'cust_123',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -146,7 +146,7 @@ void main() {
         status: SubscriptionStatus.trial,
         startedAt: DateTime.now().subtract(Duration(hours: 479)),
         trialEndsAt: DateTime.now().add(Duration(hours: 1)),
-        paymentMethod: PaymentMethod.onlineBankTransfer.code,
+        paymentMethod: 'bank_transfer',
         customerId: 'cust_123',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -164,7 +164,7 @@ void main() {
         status: SubscriptionStatus.expired,
         startedAt: DateTime.now().subtract(Duration(days: 60)),
         currentPeriodEnd: DateTime.now().subtract(Duration(days: 1)),
-        paymentMethod: PaymentMethod.onlineBankTransfer.code,
+        paymentMethod: 'bank_transfer',
         customerId: 'cust_123',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

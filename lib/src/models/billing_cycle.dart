@@ -1,12 +1,10 @@
-import 'package:equatable/equatable.dart';
-
 /// Billing cycle frequency.
 sealed class BillingCycle {
   const BillingCycle();
-  
+
   String get stringValue;
   int get days;
-  
+
   factory BillingCycle.fromString(String value) {
     switch (value) {
       case 'daily':

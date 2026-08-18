@@ -1,3 +1,7 @@
+import 'package:equatable/equatable.dart';
+
+import 'package:moe_flutter_subscription/src/models/subscription_status.dart';
+
 /// Active subscription held by user.
 class SubscriptionModel extends Equatable {
   final String id;
