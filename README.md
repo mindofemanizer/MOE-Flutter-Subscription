@@ -1,6 +1,6 @@
 # MOE-Flutter-Subscription
 
-Subscription management for MOE Flutter ecosystem — plans, billing cycles, trials.
+Subscription management for MOE Flutter ecosystem â€” plans, billing cycles, trials.
 
 ## Installation
 
@@ -9,7 +9,7 @@ dependencies:
   moe_flutter_subscription:
     git:
       url: https://github.com/mindofemanizer/MOE-Flutter-Subscription.git
-      ref: master
+      ref: v1.0.0
 ```
 
 ## Usage
@@ -71,7 +71,7 @@ switch (state) {
                   Divider(),
                   // Monthly equivalent for comparison
                   Text(
-                    '≈ ${Formatters.currency(plans[i].monthlyEquivalent)} / month',
+                    'â‰ˆ ${Formatters.currency(plans[i].monthlyEquivalent)} / month',
                     style: TextStyle(fontSize: 12),
                   ),
                   Wrap(
@@ -107,12 +107,12 @@ if (result is Ok && result.data != null) {
   final sub = result.data!;
   
   if (sub.isActive) {
-    print('✅ Active on ${sub.planName}');
+    print('âœ… Active on ${sub.planName}');
     print('Period ends: ${sub.currentPeriodEnd}');
     
     // Check if trial ending soon
     if (sub.trialEndingSoon) {
-      print('⚠️ Trial ending in <24 hours!');
+      print('âš ï¸ Trial ending in <24 hours!');
     }
     
     // Check features
@@ -120,10 +120,10 @@ if (result is Ok && result.data != null) {
       // Show premium features UI
     }
   } else if (sub.isExpired) {
-    print('📅 Subscription expired, please renew');
+    print('ðŸ“… Subscription expired, please renew');
   }
 } else {
-  print('❌ No active subscription - show plans');
+  print('âŒ No active subscription - show plans');
 }
 
 // View subscription history
@@ -194,7 +194,7 @@ Widget buildStatusIndicator(SubscriptionModel sub) {
         children: [
           Icon(Icons.check_circle, color: Colors.green),
           SizedBox(width: 8),
-          Text('${sub.planName} • ${sub.status.displayName}'),
+          Text('${sub.planName} â€¢ ${sub.status.displayName}'),
         ],
       ),
     );
@@ -248,9 +248,9 @@ const basicMonthly = SubscriptionPlanModel(..., price: 50000, cycle: monthly);
 const basicYearly = SubscriptionPlanModel(..., price: 480000, cycle: yearly);
 
 // Comparison
-print('Weekly → ${Formatters.currency(basicWeekly.monthlyEquivalent)} / month'); // ~Rp 65,000
-print('Monthly → ${Formatters.currency(basicMonthly.monthlyEquivalent)} / month'); // Rp 50,000 ✅ Best
-print('Yearly → ${Formatters.currency(basicYearly.monthlyEquivalent)} / month'); // Rp 40,000 ✅ Cheapest
+print('Weekly â†’ ${Formatters.currency(basicWeekly.monthlyEquivalent)} / month'); // ~Rp 65,000
+print('Monthly â†’ ${Formatters.currency(basicMonthly.monthlyEquivalent)} / month'); // Rp 50,000 âœ… Best
+print('Yearly â†’ ${Formatters.currency(basicYearly.monthlyEquivalent)} / month'); // Rp 40,000 âœ… Cheapest
 ```
 
 This helps users choose the best value option!
